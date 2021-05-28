@@ -66,6 +66,8 @@ Scalar FractionalStepAxisymmetricDFIBMultiphase::solve(Scalar timeStep)
 
     grid_->comm().printf("Computing IB forces...\n");
     computeIbForces(timeStep);
+    ib_->applyCollisionForce(true);
+
 
     grid_->comm().printf("Max divergence error = %.4e\n", grid_->comm().max(maxDivergenceError()));
     grid_->comm().printf("Max CFL number = %.4lf\n", maxCourantNumber(timeStep));

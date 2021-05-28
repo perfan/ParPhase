@@ -207,6 +207,22 @@ void Solver::setInitialConditions(const Input &input)
                     Circle circle = Circle(Vector2D(icTree.get<string>("center")), icTree.get<Scalar>("radius"));
                     setCircle(circle, icTree.get<Scalar>("value"), field);
                 }
+
+                else if (type == "doubleCircle")
+                {
+                    Circle circle1 = Circle(Vector2D(icTree.get<string>("center_1")), icTree.get<Scalar>("radius_1"));
+                    Circle circle2 = Circle(Vector2D(icTree.get<string>("center_2")), icTree.get<Scalar>("radius_2"));
+                    setDoubleCircle(circle1, circle2, icTree.get<Scalar>("value"), field);
+                }
+
+                else if (type == "tripleCircle")
+                {
+                    Circle circle1 = Circle(Vector2D(icTree.get<string>("center_1")), icTree.get<Scalar>("radius_1"));
+                    Circle circle2 = Circle(Vector2D(icTree.get<string>("center_2")), icTree.get<Scalar>("radius_2"));
+                    Circle circle3 = Circle(Vector2D(icTree.get<string>("center_3")), icTree.get<Scalar>("radius_3"));
+                    setTripleCircle(circle1, circle2, circle3, icTree.get<Scalar>("value"), field);
+                }
+
                 else if (type == "circleSector")
                 {
                     Circle circle = Circle(Vector2D(icTree.get<string>("center")), icTree.get<Scalar>("radius"));
@@ -322,6 +338,55 @@ void Solver::setCircle(const Circle &circle, Scalar innerValue, ScalarFiniteVolu
 
         for (const Polygon &xc: intersection(pgn, cell.shape()))
             area += xc.area();
+
+        field(cell) = innerValue * area / cell.shape().area();
+    }
+
+    grid_->sendMessages(field);
+    field.interpolateFaces();
+}
+
+void Solver::setDoubleCircle(const Circle &circle1, const Circle &circle2, Scalar innerValue, ScalarFiniteVolumeField &field)
+{
+    const Polygon pgn1 = circle1.polygonize(1000);
+    const Polygon pgn2 = circle2.polygonize(1000);
+
+
+    for (const Cell &cell: field.grid()->localCells())
+    {
+        Scalar area = 0.;
+
+        for (const Polygon &xc1: intersection(pgn1, cell.shape()))
+            area += xc1.area();
+
+        for (const Polygon &xc2: intersection(pgn2, cell.shape()))
+            area += xc2.area();
+
+        field(cell) = innerValue * area / cell.shape().area();
+    }
+
+    grid_->sendMessages(field);
+    field.interpolateFaces();
+}
+
+void Solver::setTripleCircle(const Circle &circle1, const Circle &circle2, const Circle &circle3, Scalar innerValue, ScalarFiniteVolumeField &field)
+{
+    const Polygon pgn1 = circle1.polygonize(1000);
+    const Polygon pgn2 = circle2.polygonize(1000);
+    const Polygon pgn3 = circle3.polygonize(1000);
+
+    for (const Cell &cell: field.grid()->localCells())
+    {
+        Scalar area = 0.;
+
+        for (const Polygon &xc1: intersection(pgn1, cell.shape()))
+            area += xc1.area();
+
+        for (const Polygon &xc2: intersection(pgn2, cell.shape()))
+            area += xc2.area();
+
+        for (const Polygon &xc3: intersection(pgn3, cell.shape()))
+            area += xc3.area();
 
         field(cell) = innerValue * area / cell.shape().area();
     }

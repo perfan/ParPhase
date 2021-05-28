@@ -85,6 +85,10 @@ protected:
 
     void setCircle(const Circle &circle, Scalar innerValue, ScalarFiniteVolumeField &field);
 
+    void setDoubleCircle(const Circle &circle1, const Circle &circle2, Scalar innerValue, ScalarFiniteVolumeField &field);
+
+    void setTripleCircle(const Circle &circle1, const Circle &circle2, const Circle &circle3, Scalar innerValue, ScalarFiniteVolumeField &field);
+
     void setCircle(const Circle &circle, const Vector2D &innerValue, VectorFiniteVolumeField &field);
 
     void setCircleSector(const Circle &circle,
