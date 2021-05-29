@@ -7,6 +7,7 @@
 #include "ImmersedBoundaryObject.h"
 #include "CollisionModel.h"
 #include "SoftSphereCollisionModel.h"
+#include "LubricationCorrection.h"
 
 class ImmersedBoundary
 {
@@ -116,6 +117,8 @@ public:
 
     virtual void applyCollisionForce(bool add = false);
 
+    virtual void applyLubricationForce(bool add = false);
+
     const std::shared_ptr<FiniteVolumeField<int>> &cellStatus()
     { return cellStatus_; }
 
@@ -139,8 +142,14 @@ protected:
     //- Fast searching
     boost::geometry::index::rtree<std::shared_ptr<ImmersedBoundaryObject>, Parameters, IndexableGetter, EqualTo> rTree_;
 
-    //- Collision model
+    //- Collision model 
+    // std::shared_ptr<CollisionModel> collisionModel_;
+
+    //- Soft-sphere Collision model 
     std::shared_ptr<SoftSphereCollisionModel> collisionModel_;
+
+    //- Lubrication model
+    std::shared_ptr<LubricationCorrection> lubricationCorrection_;
 };
 
 #endif

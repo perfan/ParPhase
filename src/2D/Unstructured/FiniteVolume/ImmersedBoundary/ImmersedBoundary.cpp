@@ -207,6 +207,12 @@ ImmersedBoundary::ImmersedBoundary(const Input &input,
                 input.boundaryInput().get<Scalar>("ImmersedBoundaries.Collisions.WallDamping", 1e+2),
                 input.boundaryInput().get<Scalar>("ImmersedBoundaries.Collisions.WallRange", 0.05)
                 );
+
+    lubricationCorrection_ = std::make_shared<LubricationCorrection>(
+                input.boundaryInput().get<Scalar>("ImmersedBoundaries.Lubrication.FluidViscosity", 1e+6),
+                input.boundaryInput().get<Scalar>("ImmersedBoundaries.Lubrication.ParticleRange", 0.05),
+                input.boundaryInput().get<Scalar>("ImmersedBoundaries.Lubrication.WallRange", 0.)
+                );
 }
 
 void ImmersedBoundary::setDomainCells(const std::shared_ptr<CellGroup> &domainCells)
@@ -394,6 +400,36 @@ void ImmersedBoundary::applyCollisionForce(bool add)
                 ibObjP->addForce(fc);
             else
                 ibObjP->applyForce(fc);
+        }
+}
+
+void ImmersedBoundary::applyLubricationForce(bool add)
+{
+    if(collisionModel_)
+        for (auto ibObjP: ibObjs_)
+        {
+            //- Dont compute if no motion
+            if(!ibObjP->motion())
+                continue;
+
+            if(ibObjP->shape().type() != Shape2D::CIRCLE)
+            {
+                grid_->comm().printf("Non-circular shapes are not supported for collisions.\n");
+                continue;
+            }
+
+            Vector2D f_lubrication = grid_->comm().sum(lubricationCorrection_->force(*ibObjP, *grid_));
+
+            const Circle &circle = static_cast<const Circle&>(ibObjP->shape());
+
+            //- Collisions with particles
+            for (auto ibObjQ: findAllIbObjs(Circle(circle.centroid(), circle.radius() + lubricationCorrection_->range_particle())))
+                f_lubrication += lubricationCorrection_->force(*ibObjP, *ibObjQ);
+
+            if(add)
+                ibObjP->addForce(f_lubrication);
+            else
+                ibObjP->applyForce(f_lubrication);
         }
 }
 
