@@ -63,6 +63,6 @@ Vector2D CollisionModel::force(const ImmersedBoundaryObject &ibObj, const Finite
         throw Exception("CollisionModel", "force", "unsupported shape type.");
     }
 
-    return fc;
-    // return fc_zero;
+    // return fc;
+    return fc_zero;
 }

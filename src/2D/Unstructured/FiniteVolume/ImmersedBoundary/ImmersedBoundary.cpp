@@ -193,10 +193,18 @@ ImmersedBoundary::ImmersedBoundary(const Input &input,
     rTree_.insert(ibObjs_.begin(), ibObjs_.end());
 
     //- Collision model
-    collisionModel_ = std::make_shared<CollisionModel>(
-                input.boundaryInput().get<Scalar>("ImmersedBoundaries.Collisions.ParticleStiffness", 1e-6), //1e-4
+    // collisionModel_ = std::make_shared<CollisionModel>(
+    //             input.boundaryInput().get<Scalar>("ImmersedBoundaries.Collisions.ParticleStiffness", 1e-6), //1e-4
+    //             input.boundaryInput().get<Scalar>("ImmersedBoundaries.Collisions.ParticleRange", 0.),
+    //             input.boundaryInput().get<Scalar>("ImmersedBoundaries.Collisions.WallStiffness", 1e-6),
+    //             input.boundaryInput().get<Scalar>("ImmersedBoundaries.Collisions.WallRange", 0.05)
+    //             );
+    collisionModel_ = std::make_shared<SoftSphereCollisionModel>(
+                input.boundaryInput().get<Scalar>("ImmersedBoundaries.Collisions.ParticleStiffness", 1e+6),
+                input.boundaryInput().get<Scalar>("ImmersedBoundaries.Collisions.ParticleDamping", 0.),
                 input.boundaryInput().get<Scalar>("ImmersedBoundaries.Collisions.ParticleRange", 0.),
-                input.boundaryInput().get<Scalar>("ImmersedBoundaries.Collisions.WallStiffness", 1e-6),
+                input.boundaryInput().get<Scalar>("ImmersedBoundaries.Collisions.WallStiffness", 1e+5),
+                input.boundaryInput().get<Scalar>("ImmersedBoundaries.Collisions.WallDamping", 1e+2),
                 input.boundaryInput().get<Scalar>("ImmersedBoundaries.Collisions.WallRange", 0.05)
                 );
 }

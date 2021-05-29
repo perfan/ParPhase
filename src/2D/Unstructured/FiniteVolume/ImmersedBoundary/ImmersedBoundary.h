@@ -6,6 +6,7 @@
 #include "FiniteVolume/Equation/FiniteVolumeEquation.h"
 #include "ImmersedBoundaryObject.h"
 #include "CollisionModel.h"
+#include "SoftSphereCollisionModel.h"
 
 class ImmersedBoundary
 {
@@ -139,7 +140,7 @@ protected:
     boost::geometry::index::rtree<std::shared_ptr<ImmersedBoundaryObject>, Parameters, IndexableGetter, EqualTo> rTree_;
 
     //- Collision model
-    std::shared_ptr<CollisionModel> collisionModel_;
+    std::shared_ptr<SoftSphereCollisionModel> collisionModel_;
 };
 
 #endif
