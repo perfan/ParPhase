@@ -209,7 +209,7 @@ ImmersedBoundary::ImmersedBoundary(const Input &input,
                 );
 
     lubricationCorrection_ = std::make_shared<LubricationCorrection>(
-                input.boundaryInput().get<Scalar>("ImmersedBoundaries.Lubrication.FluidViscosity", 1e+6),
+                input.caseInput().get<Scalar>("Properties.mu2", 1),
                 input.boundaryInput().get<Scalar>("ImmersedBoundaries.Lubrication.ParticleRange", 0.05),
                 input.boundaryInput().get<Scalar>("ImmersedBoundaries.Lubrication.WallRange", 0.)
                 );
